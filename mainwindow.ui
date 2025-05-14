@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1076</width>
-    <height>596</height>
+    <width>1094</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,20 +18,20 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>30</y>
       <width>160</width>
-      <height>80</height>
+      <height>141</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
-     <item row="1" column="1">
+     <item row="3" column="1">
       <widget class="QPushButton" name="btnProcess">
        <property name="text">
-        <string>Обработать</string>
+        <string>Найти звезды</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="4" column="1">
       <widget class="QPushButton" name="btnSave">
        <property name="text">
         <string>Выгрузить</string>
@@ -42,6 +42,20 @@
       <widget class="QPushButton" name="btnLoad">
        <property name="text">
         <string>Загрузить</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="btnFilter">
+       <property name="text">
+        <string>Применить фильтр</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btnBack">
+       <property name="text">
+        <string>Сброс в исходное</string>
        </property>
       </widget>
      </item>
@@ -64,9 +78,9 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>50</y>
+      <y>130</y>
       <width>161</width>
-      <height>66</height>
+      <height>41</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
@@ -77,9 +91,6 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="light_min"/>
-     </item>
      <item row="1" column="1">
       <widget class="QLabel" name="label_3">
        <property name="text">
@@ -87,13 +98,16 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="light_min"/>
+     </item>
     </layout>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>160</y>
+      <y>180</y>
       <width>511</width>
       <height>401</height>
      </rect>
@@ -102,20 +116,13 @@
    <widget class="QWidget" name="formLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>40</y>
+      <x>340</x>
+      <y>50</y>
       <width>161</width>
       <height>101</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_3">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Сортировка</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
       <widget class="QComboBox" name="sortComboBox">
        <item>
@@ -150,7 +157,44 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Сортировка</string>
+       </property>
+      </widget>
+     </item>
     </layout>
+   </widget>
+   <widget class="QComboBox" name="filterComboBox">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>90</y>
+      <width>155</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>нет</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Размытие</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Медианный</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Билатеральный</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -158,7 +202,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1076</width>
+     <width>1094</width>
      <height>17</height>
     </rect>
    </property>

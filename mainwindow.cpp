@@ -10,7 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-cv::Mat imgOriginal, imgWithCenters;
+cv::Mat imgOriginal,imgBase, imgWithCenters;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnProcess, &QPushButton::clicked, this, &MainWindow::processImage);
     connect(ui->btnSave, &QPushButton::clicked, this, &MainWindow::saveImage);
     connect(ui->sortButton, &QPushButton::clicked, this, &MainWindow::on_sortButton_clicked);
+    connect(ui->btnFilter, &QPushButton::clicked, this, &MainWindow::applyFilter);
+    connect(ui->btnBack, &QPushButton::clicked, this, &MainWindow::resetAll);
 
 }
 
@@ -38,6 +40,7 @@ void MainWindow::loadImage()
     if (filename.isEmpty()) return;
 
     imgOriginal = cv::imread(filename.toStdString(), cv::IMREAD_GRAYSCALE);
+    imgBase = imgOriginal;
     if (imgOriginal.empty()) {
         QMessageBox::warning(this, "Ошибка", "Не удалось загрузить изображение.");
         return;
@@ -88,9 +91,13 @@ void MainWindow::showImage(const cv::Mat &img)
 
 
 
-
 void MainWindow::on_sortButton_clicked()
 {
+    if (imgOriginal.empty()) {
+        QMessageBox::warning(this, "Ошибка", "Сначала загрузите изображение.");
+        return;
+    }
+
     int criterion = ui->sortComboBox->currentIndex();
 
     std::sort(stars.begin(), stars.end(), [=](const star& a, const star& b) {
@@ -126,5 +133,53 @@ void MainWindow::on_sortButton_clicked()
 
     // Обновить таблицу
     fill_star_table(ui->tableWidget, stars);
+}
+void MainWindow::applyFilter()
+{
+    if (imgOriginal.empty()) return;
+
+    cv::Mat result = imgOriginal.clone();
+    int selectedIndex = ui->filterComboBox->currentIndex();
+
+    switch (selectedIndex) {
+    case 1: // Gaussian Blur
+        cv::GaussianBlur(imgOriginal, result, cv::Size(5, 5), 1.5);
+        break;
+    case 2: // Median Blur
+        cv::medianBlur(imgOriginal, result, 3);
+        break;
+    case 3: // Bilateral Filter
+        cv::bilateralFilter(imgOriginal, result, 9, 75, 75);
+        break;
+    case 0: // Нет — оставить без изменений
+    default:
+        result = imgOriginal.clone();
+        break;
+    }
+
+    imgOriginal = result.clone(); // Обновляем оригинал
+    showImage(result);
+}
+void MainWindow::resetAll()
+{
+     imgOriginal.release();
+     imgWithCenters.release();
+     ui->imageLabel->clear();
+     ui->tableWidget->clearContents();
+     ui->tableWidget->setRowCount(0);
+      stars.clear();
+     ui->light_min->setText("50");
+    imgOriginal=imgBase;
+    showImage(imgOriginal);
+}
+
+void MainWindow::on_btnBack_clicked(){
+}
+void MainWindow::on_light_min_editingFinished(){
+
+}
+
+void MainWindow::on_light_min_cursorPositionChanged(int oldPos, int newPos){
+
 }
 

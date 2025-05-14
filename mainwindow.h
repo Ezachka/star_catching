@@ -29,10 +29,14 @@ private slots:
 
     void on_sortButton_clicked();
 
+    void on_btnBack_clicked();
+
 private:
     void showImage(const cv::Mat &img);  // Приватный метод для отображения
     std::vector<star> stars;
     Ui::MainWindow *ui;
+    void applyFilter();
+    void resetAll();
 };
 
 #endif // MAINWINDOW_H
