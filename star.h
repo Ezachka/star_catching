@@ -32,4 +32,6 @@ std::vector<star> collect_stars(const cv::Mat& imgOriginal,
 void print_stars_info(const std::vector<star>& stars, int max_pixels_per_star);
 void print_stars_info(const std::vector<star>& stars);
 void fill_star_table(QTableWidget* table, const std::vector<star>& stars);
+void saveTableToCSV(QTableWidget* table, const QString& filePath);
+
 #endif // STAR_H

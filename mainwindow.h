@@ -37,7 +37,7 @@ private:
     Ui::MainWindow *ui;
     void applyFilter();
     void resetAll();
-
+    void save_table();
 };
 
 #endif // MAINWINDOW_H

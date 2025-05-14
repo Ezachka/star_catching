@@ -1,7 +1,10 @@
 #include "star.h"
 #include <QDebug>
 #include <opencv2/imgproc.hpp> // обязательно для putText
-
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+#include <QMessageBox>
 std::vector<star> collect_stars(const cv::Mat& imgOriginal,
                                 const cv::Mat& labels,
                                 const cv::Mat& centroids,
@@ -84,7 +87,7 @@ void fill_star_table(QTableWidget* table, const std::vector<star>& stars){
     table->clear();
     table->setRowCount(static_cast<int>(stars.size()));
     table->setColumnCount(4);
-    QStringList headers = {"ID", "Центр масс", "Пикселей", "Сред. интенсивность"};
+    QStringList headers = {"ID", "Center of Mass", "Pixels", "Average Intensity"};
     table->setHorizontalHeaderLabels(headers);
 
     for (int i = 0; i < static_cast<int>(stars.size()); ++i) {
@@ -103,6 +106,33 @@ void fill_star_table(QTableWidget* table, const std::vector<star>& stars){
 
     table->resizeColumnsToContents();
     table->horizontalHeader()->setStretchLastSection(true);
+}
+void saveTableToCSV(QTableWidget* table, const QString& filePath) {
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(nullptr, "Ошибка", "Не удалось открыть файл для записи.");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    // Заголовки
+    QStringList headers;
+    for (int col = 0; col < table->columnCount(); ++col)
+        headers << table->horizontalHeaderItem(col)->text();
+    out << headers.join(";") << "\n"; // Используем ; вместо , для локали
+
+    // Данные
+    for (int row = 0; row < table->rowCount(); ++row) {
+        QStringList rowData;
+        for (int col = 0; col < table->columnCount(); ++col) {
+            QTableWidgetItem* item = table->item(row, col);
+            rowData << (item ? item->text() : "");
+        }
+        out << rowData.join(";") << "\n";
+    }
+
+    file.close();
 }
 void draw_star_markers(cv::Mat& image, const std::vector<star>& stars){
 

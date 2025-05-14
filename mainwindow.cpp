@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->sortButton, &QPushButton::clicked, this, &MainWindow::on_sortButton_clicked);
     connect(ui->btnFilter, &QPushButton::clicked, this, &MainWindow::applyFilter);
     connect(ui->btnBack, &QPushButton::clicked, this, &MainWindow::resetAll);
-
+    connect(ui->btnSave_table, &QPushButton::clicked, this, &MainWindow::save_table);
 
 }
 
@@ -71,6 +71,38 @@ void MainWindow::processImage()
     fill_star_table(ui->tableWidget, stars);
     draw_star_markers(imgWithCenters, stars);
     showImage(imgWithCenters);
+}
+void MainWindow::save_table()
+{
+    // QString fileName = QFileDialog::getSaveFileName(this, "Сохранить таблицу", "", "CSV файлы (*.csv);;Все файлы (*.*)");
+    // if (!fileName.isEmpty()) {
+    //     saveTableToCSV(ui->tableWidget, fileName);
+    // }
+
+    QString fileName = QFileDialog::getSaveFileName(this, "Сохранить данные звёзд", "", "Text Files (*.txt);;All Files (*)");
+    if (fileName.isEmpty())
+        return;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "Ошибка", "Не удалось открыть файл для записи.");
+        return;
+    }
+
+    QTextStream out(&file);
+
+    // Предположим, у вас есть вектор звёзд — например, this->stars
+    for (const star& s : this->stars) {
+        out << "Star ID: " << s.id << "\n";
+        out << "Center of Mass: (" << s.centerOfMass.x << ", " << s.centerOfMass.y << ")\n";
+        out << "Pixels (" << s.pixels.size() << "):\n";
+        for (const star_pixel& p : s.pixels) {
+            out << "  (" << p.x << ", " << p.y << ") Intensity: " << static_cast<int>(p.intensity) << "\n";
+        }
+        out << "\n";
+    }
+
+    file.close();
 }
 
 void MainWindow::saveImage()
