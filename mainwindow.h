@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <opencv2/opencv.hpp>  // Добавлено для использования cv::Mat
-
+#include "star.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -27,9 +27,11 @@ private slots:
 
     void on_light_min_editingFinished();
 
+    void on_sortButton_clicked();
+
 private:
     void showImage(const cv::Mat &img);  // Приватный метод для отображения
-
+    std::vector<star> stars;
     Ui::MainWindow *ui;
 };
 

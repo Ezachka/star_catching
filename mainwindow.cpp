@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "star.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QImage>
 #include <QPixmap>
+#include <QTableWidget>
+#include <QHeaderView>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -15,9 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->light_min->setText("50");
+
     connect(ui->btnLoad, &QPushButton::clicked, this, &MainWindow::loadImage);
     connect(ui->btnProcess, &QPushButton::clicked, this, &MainWindow::processImage);
     connect(ui->btnSave, &QPushButton::clicked, this, &MainWindow::saveImage);
+    connect(ui->sortButton, &QPushButton::clicked, this, &MainWindow::on_sortButton_clicked);
+
 }
 
 MainWindow::~MainWindow()
@@ -44,27 +51,21 @@ void MainWindow::processImage()
     if (imgOriginal.empty()) return;
 
     QString light_minimum = ui->light_min->text();
-    QString light_maximum = ui->light_max->text();
-    bool ok1, ok2;
+    bool ok1;
     double min_value = light_minimum.toDouble(&ok1);
-    double max_value = light_maximum.toDouble(&ok2);
-    if(max_value>255){max_value=255;}
 
     cv::Mat bin;
-    cv::threshold(imgOriginal, bin, min_value, max_value, cv::THRESH_BINARY);
+    cv::threshold(imgOriginal, bin, min_value, 255, cv::THRESH_BINARY);
 
     cv::Mat labels, stats, centroids;
-    int nLabels = cv::connectedComponentsWithStats(bin, labels, stats, centroids);
+    cv::connectedComponentsWithStats(bin, labels, stats, centroids);
 
     cv::cvtColor(imgOriginal, imgWithCenters, cv::COLOR_GRAY2BGR);
-
-    for (int i = 1; i < nLabels; ++i) {
-        double cx = centroids.at<double>(i, 0);
-        double cy = centroids.at<double>(i, 1);
-        cv::circle(imgWithCenters, cv::Point((int)cx, (int)cy), 1, cv::Scalar(0, 0, 255), -1);
-    }
-
-
+    stars = collect_stars(imgOriginal, labels, centroids, imgWithCenters);
+   // print_stars_info(stars, 5);
+    print_stars_info(stars);
+    fill_star_table(ui->tableWidget, stars);
+    draw_star_markers(imgWithCenters, stars);
     showImage(imgWithCenters);
 }
 
@@ -86,4 +87,44 @@ void MainWindow::showImage(const cv::Mat &img)
 
 
 
+
+
+void MainWindow::on_sortButton_clicked()
+{
+    int criterion = ui->sortComboBox->currentIndex();
+
+    std::sort(stars.begin(), stars.end(), [=](const star& a, const star& b) {
+        switch (criterion) {
+        case 2: // По координате X
+            return a.centerOfMass.x > b.centerOfMass.x;
+        case 3: // По координате Y
+            return a.centerOfMass.y > b.centerOfMass.y;
+        case 0: { // По интенсивности
+            double sumA = 0, sumB = 0;
+            for (const auto& p : a.pixels) sumA += p.intensity;
+            for (const auto& p : b.pixels) sumB += p.intensity;
+            double avgA = sumA / a.pixels.size();
+            double avgB = sumB / b.pixels.size();
+            return avgA > avgB;
+        }
+        case 1: // По количеству пикселей
+            return a.pixels.size() > b.pixels.size();
+        default:
+            return false;
+        }
+    });
+
+    // Обновить ID
+    for (int i = 0; i < static_cast<int>(stars.size()); ++i) {
+        stars[i].id = i + 1;
+    }
+
+    // Перерисовать изображение
+    cv::cvtColor(imgOriginal, imgWithCenters, cv::COLOR_GRAY2BGR);
+    draw_star_markers(imgWithCenters, stars);
+    showImage(imgWithCenters);
+
+    // Обновить таблицу
+    fill_star_table(ui->tableWidget, stars);
+}
 

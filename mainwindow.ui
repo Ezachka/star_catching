@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1076</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QWidget" name="formLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>210</y>
+      <x>10</x>
+      <y>40</y>
       <width>160</width>
       <height>80</height>
      </rect>
@@ -50,7 +50,7 @@
    <widget class="QLabel" name="imageLabel">
     <property name="geometry">
      <rect>
-      <x>270</x>
+      <x>540</x>
       <y>20</y>
       <width>512</width>
       <height>512</height>
@@ -63,37 +63,90 @@
    <widget class="QWidget" name="formLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>310</y>
+      <x>170</x>
+      <y>50</y>
       <width>161</width>
       <height>66</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Мин </string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="light_min"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Макс</string>
+        <string>Светимость </string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>160</y>
+      <width>511</width>
+      <height>401</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="formLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>40</y>
+      <width>161</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Сортировка</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="light_min"/>
+      <widget class="QComboBox" name="sortComboBox">
+       <item>
+        <property name="text">
+         <string>По интенсивности
+</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>По количеству пикселей
+</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>По координате X</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>По координате Y
+</string>
+        </property>
+       </item>
+      </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="light_max"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_3">
+      <widget class="QPushButton" name="sortButton">
        <property name="text">
-        <string>Светимость </string>
+        <string>Сортировать</string>
        </property>
       </widget>
      </item>
@@ -105,7 +158,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1076</width>
      <height>17</height>
     </rect>
    </property>
