@@ -37,6 +37,7 @@ private:
     Ui::MainWindow *ui;
     void applyFilter();
     void resetAll();
+
 };
 
 #endif // MAINWINDOW_H

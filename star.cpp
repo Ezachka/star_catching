@@ -105,6 +105,17 @@ void fill_star_table(QTableWidget* table, const std::vector<star>& stars){
     table->horizontalHeader()->setStretchLastSection(true);
 }
 void draw_star_markers(cv::Mat& image, const std::vector<star>& stars){
+
+    cv::Point origin(0, 0); // Нулевая точка (0, 0)
+    cv::circle(image, origin, 5, cv::Scalar(255, 255, 255), -1);  // Белый кружок на (0, 0)
+    // Стрелка по оси X
+    cv::arrowedLine(image, origin, cv::Point(100, 0), cv::Scalar(255, 0, 0), 1, 8, 0, 0.1);
+    // Стрелка по оси Y
+    cv::arrowedLine(image, origin, cv::Point(0, 100), cv::Scalar(0, 255, 0), 1, 8, 0, 0.1);
+
+    // Рисуем метки для осей
+    cv::putText(image, "X", cv::Point(110, 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 0, 0), 1);
+    cv::putText(image, "Y", cv::Point(10, 110), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 1);
     for (const auto& s : stars) {
         cv::Point center(static_cast<int>(s.centerOfMass.x), static_cast<int>(s.centerOfMass.y));
 

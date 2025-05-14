@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnFilter, &QPushButton::clicked, this, &MainWindow::applyFilter);
     connect(ui->btnBack, &QPushButton::clicked, this, &MainWindow::resetAll);
 
+
 }
 
 MainWindow::~MainWindow()
@@ -103,9 +104,9 @@ void MainWindow::on_sortButton_clicked()
     std::sort(stars.begin(), stars.end(), [=](const star& a, const star& b) {
         switch (criterion) {
         case 2: // По координате X
-            return a.centerOfMass.x > b.centerOfMass.x;
+            return a.centerOfMass.x < b.centerOfMass.x;
         case 3: // По координате Y
-            return a.centerOfMass.y > b.centerOfMass.y;
+            return a.centerOfMass.y < b.centerOfMass.y;
         case 0: { // По интенсивности
             double sumA = 0, sumB = 0;
             for (const auto& p : a.pixels) sumA += p.intensity;
@@ -138,10 +139,16 @@ void MainWindow::applyFilter()
 {
     if (imgOriginal.empty()) return;
 
-    cv::Mat result = imgOriginal.clone();
+
     int selectedIndex = ui->filterComboBox->currentIndex();
 
+    cv::Mat result = imgOriginal.clone();
+    cv::Mat kernel, kern;
+
     switch (selectedIndex) {
+    case 0: // Нет — оставить без изменений
+        result = imgOriginal.clone();
+        break;
     case 1: // Gaussian Blur
         cv::GaussianBlur(imgOriginal, result, cv::Size(5, 5), 1.5);
         break;
@@ -151,7 +158,95 @@ void MainWindow::applyFilter()
     case 3: // Bilateral Filter
         cv::bilateralFilter(imgOriginal, result, 9, 75, 75);
         break;
-    case 0: // Нет — оставить без изменений
+    case 4: // Increase contrast
+        imgOriginal.convertTo(result, -1, 1.1, 0); // 1.5 - коэффициент контраста
+        break;
+    case 5: // Decrease contrast
+        imgOriginal.convertTo(result, -1, 0.9, 0);
+        break;
+    case 6: // Horizontal filter
+        kernel = cv::Mat::ones(1, 4, CV_32F) / 5;
+        cv::filter2D(imgOriginal, result, -1, kernel);
+        break;
+    case 7: // Vertical filter
+        kern = cv::Mat::ones(4, 1, CV_32F) / 5;
+        cv::filter2D(imgOriginal, result, -1, kern);
+        break;
+    case 8:
+    {
+        cv::GaussianBlur(imgOriginal, result, cv::Size(5, 5), 1.5);
+
+        int threshold = 10;
+        double alpha_high = 2;  // Коэффициент увеличения яркости для ярких пикселей
+        double alpha_low = 0.1;   // Коэффициент уменьшения яркости для темных пикселей
+
+        result = imgOriginal.clone(); // Клонируем изображение, чтобы работать с ним
+
+        // Преобразуем изображение в формат, пригодный для обработки (если оно 8 бит)
+        cv::Mat img_float;
+        imgOriginal.convertTo(img_float, CV_32F);
+
+        // Для каждого пикселя
+        for (int y = 0; y < img_float.rows; ++y) {
+            for (int x = 0; x < img_float.cols; ++x) {
+                float& pixel = img_float.at<float>(y, x); // Яркость пикселя
+
+                if (pixel > threshold) {
+                    // Увеличиваем яркость для светлых пикселей
+                    pixel = cv::saturate_cast<float>(pixel * alpha_high);
+                } else {
+                    // Уменьшаем яркость для темных пикселей
+                    pixel = cv::saturate_cast<float>(pixel * alpha_low);
+                }
+            }
+        }
+
+        // Преобразуем обратно в 8-битное изображение
+        img_float.convertTo(result, CV_8U);
+
+    }
+    case 9:
+    {
+        QString light_minimum = ui->light_min->text();
+        bool ok1;
+        int threshold = light_minimum.toInt(&ok1);
+
+        if (!ok1) {
+            qWarning() << "Ошибка преобразования порога яркости!";
+            return;
+        }
+
+        double alpha_high = 1.5;  // Коэффициент увеличения яркости для ярких пикселей
+        double alpha_low = 0.5;   // Коэффициент уменьшения яркости для темных пикселей
+
+        result = imgOriginal.clone(); // Клонируем изображение, чтобы работать с ним
+
+        // Преобразуем изображение в формат, пригодный для обработки (если оно 8 бит)
+        cv::Mat img_float;
+        imgOriginal.convertTo(img_float, CV_32F);
+
+        // Для каждого пикселя
+        for (int y = 0; y < img_float.rows; ++y) {
+            for (int x = 0; x < img_float.cols; ++x) {
+                float& pixel = img_float.at<float>(y, x); // Яркость пикселя
+
+                if (pixel > threshold) {
+                    // Увеличиваем яркость для светлых пикселей
+                    pixel = cv::saturate_cast<float>(pixel * alpha_high);
+                } else {
+                    // Уменьшаем яркость для темных пикселей
+                    pixel = cv::saturate_cast<float>(pixel * alpha_low);
+                }
+            }
+        }
+
+        // Преобразуем обратно в 8-битное изображение
+        img_float.convertTo(result, CV_8U);
+
+        break;
+    }
+
+
     default:
         result = imgOriginal.clone();
         break;
